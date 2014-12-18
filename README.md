@@ -1,5 +1,7 @@
 # Package mail
 
+[![Build Status](https://travis-ci.org/mohamedattahri/mail.svg?branch=master)](https://travis-ci.org/mohamedattahri/mail)  [![GoDoc](https://godoc.org/github.com/mohamedattahri/mail?status.svg)](https://godoc.org/github.com/mohamedattahri/mail)
+
 Package mail implements composing and parsing of mail messages.
 
 Creating a message with multiple parts and attachments ends up being a surprisingly painful task in Go. The net/mail package in the standard library only offers tools to parse mail messages and addresses.
