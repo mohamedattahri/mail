@@ -1,7 +1,6 @@
-// Copyright 2014 Attesticate.com - All rights reserved.
-// This source code is proprietary and confidential.
-// Unauthorised copying or distribution of this file is strictly prohibited.
-// Mohamed Attahri <mohamed@attahri.com>
+// Use of this source code is governed by a BSD-style licence.
+// Copyright 2011 The Go Authors. All rights reserved.
+// Author: Mohamed Attahri <mohamed@attahri.com>
 
 package mail
 
