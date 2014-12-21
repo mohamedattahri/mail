@@ -136,7 +136,7 @@ func (m *Message) SetSubject(subject string) {
 func (m *Message) From() *Address {
 	address, err := ParseAddress(m.GetHeader("From"))
 	if err != nil {
-		return &Address{}
+		return nil
 	}
 	return address
 }
