@@ -57,7 +57,7 @@ import (
 	"time"
 	"unicode"
 
-	qp "gopkg.in/alexcesaro/quotedprintable.v1"
+	qp "gopkg.in/alexcesaro/quotedprintable.v3"
 )
 
 var debug = debugT(false)
@@ -108,7 +108,8 @@ func (m *Message) GetHeader(header string) string {
 	if encoded == "" {
 		return ""
 	}
-	decoded, _, err := qp.DecodeHeader(encoded)
+	dec := new(qp.WordDecoder)
+	decoded, err := dec.DecodeHeader(encoded)
 	if err != nil {
 		return ""
 	}
@@ -266,11 +267,10 @@ func (m *Message) Bytes() []byte {
 	//
 	// Header
 	//
-	headerEncoder := qp.Q.NewHeaderEncoder("utf-8")
 	for key, items := range m.Header {
 		for _, item := range items {
 			if item != "" {
-				fmt.Fprintf(output, "%s: %s%s", key, headerEncoder.Encode(item), crlf)
+				fmt.Fprintf(output, "%s: %s%s", key, qp.QEncoding.Encode("utf-8", item), crlf)
 			}
 		}
 	}
@@ -956,7 +956,7 @@ func (p *Multipart) AddText(mediaType string, r io.Reader) error {
 	}
 
 	reader := bufio.NewReader(r)
-	encoder := qp.NewEncoder(w)
+	encoder := qp.NewWriter(w)
 	buffer := make([]byte, maxLineLen)
 	for {
 		read, err := reader.Read(buffer[:])
