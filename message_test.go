@@ -62,7 +62,7 @@ func ExampleMessage_mixed() {
 	alternative.AddText("text/plain", text)
 	alternative.AddText("text/html", html)
 	alternative.Close()
-	mixed.AddAttachment(Attachment, "Photo", "image/jpeg", attachment)
+	mixed.AddAttachment(Attachment, "Photo", "image/jpeg", attachment, nil)
 	mixed.Close()
 
 	fmt.Println(msg)
