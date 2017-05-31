@@ -117,10 +117,15 @@ func (m *Message) GetHeader(header string) string {
 	return decoded
 }
 
-// SetHeader adds header to the list of headers and sets it to quoted-printable
+// SetHeader adds (overwrites) header to the list of headers and sets it to quoted-printable
 // encoded value.
 func (m *Message) SetHeader(header, value string) {
 	textproto.MIMEHeader(m.Header).Set(header, value)
+}
+// AddHeader adds (appends) header to the list of headers and sets it to quoted-printable
+// encoded value.
+func (m *Message) AddHeader(header, value string) {
+	textproto.MIMEHeader(m.Header).Add(header, value)
 }
 
 // Subject line of the message.
@@ -989,7 +994,7 @@ func (p *Multipart) AddText(mediaType string, r io.Reader) error {
 // In the following example, the media MIME type will be set to "image/png"
 // based on the ".png" extension of the filename "gopher.png":
 // 	part.AddAttachment(Inline, "gopher.png", "", image)
-func (p *Multipart) AddAttachment(attachType AttachmentType, filename, mediaType string, r io.Reader) (err error) {
+func (p *Multipart) AddAttachment(attachType AttachmentType, filename, mediaType string, r io.Reader, header map[string][]string) (err error) {
 	if p.isClosed {
 		return ErrPartClosed
 	}
@@ -1001,16 +1006,18 @@ func (p *Multipart) AddAttachment(attachType AttachmentType, filename, mediaType
 	if mediaType == "" {
 		mediaType = "application/octet-stream"
 	}
+	if header == nil {
+		header = map[string][]string{
+			"Content-Type":              {mediaType},
+			"Content-ID":                {fmt.Sprintf("<%s>", filename)},
+			"Content-Location":          {fmt.Sprintf("%s", filename)},
+			"Content-Transfer-Encoding": {"base64"},
+			"Content-Disposition":       {fmt.Sprintf("%s;\r\n\tfilename=%s;", attachType, filename)},
+		}
+	}
+	mapHeader := textproto.MIMEHeader(header)
 
-	header := textproto.MIMEHeader(map[string][]string{
-		"Content-Type":              {mediaType},
-		"Content-ID":                {fmt.Sprintf("<%s>", filename)},
-		"Content-Location":          {fmt.Sprintf("%s", filename)},
-		"Content-Transfer-Encoding": {"base64"},
-		"Content-Disposition":       {fmt.Sprintf("%s;\r\n\tfilename=%s;", attachType, filename)},
-	})
-
-	w, err := p.writer.CreatePart(header)
+	w, err := p.writer.CreatePart(mapHeader)
 	if err != nil {
 		return err
 	}
